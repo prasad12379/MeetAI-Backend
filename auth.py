@@ -12,10 +12,12 @@ ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"])
 
 def hash_password(password: str):
-    return pwd_context.hash(password)
+    truncated = password.encode("utf-8")[:72]
+    return pwd_context.hash(truncated)
 
 def verify_password(plain, hashed):
-    return pwd_context.verify(plain, hashed)
+    truncated = plain.encode("utf-8")[:72]
+    return pwd_context.verify(truncated, hashed)
 
 def create_token(data: dict):
     to_encode = data.copy()
