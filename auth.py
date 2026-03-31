@@ -1,4 +1,4 @@
-from passlib.context import CryptContext
+import bcrypt
 from jose import jwt
 from datetime import datetime, timedelta
 import os
@@ -9,15 +9,13 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 
-pwd_context = CryptContext(schemes=["bcrypt"])
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
+    return hashed.decode("utf-8")
 
-def hash_password(password: str):
-    truncated = password.encode("utf-8")[:72]
-    return pwd_context.hash(truncated)
-
-def verify_password(plain, hashed):
-    truncated = plain.encode("utf-8")[:72]
-    return pwd_context.verify(truncated, hashed)
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 def create_token(data: dict):
     to_encode = data.copy()
